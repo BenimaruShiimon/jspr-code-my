@@ -53,7 +53,7 @@ public class Server {
             Handler handler = findHandler(method, path);
 
             if (handler != null) {
-                handler.handle((com.sun.net.httpserver.Request) request, writer);
+                handler.handle(request, writer);
             } else {
                 sendError(writer, 404, "Not Found");
             }

@@ -1,6 +1,6 @@
 package ru.netology.handler;
 
-import com.sun.net.httpserver.Request;
+import ru.netology.model.Request;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
