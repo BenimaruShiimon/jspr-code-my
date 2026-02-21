@@ -18,12 +18,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-    private final Map<String, Handler> handlers = new HashMap<>(); // регистрация обработчиков
-    private final Path publicDir = Path.of(".", "public"); // папки с HTML/CSS/JS файлами
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(64); // ThreadPool на 64 потока
+    private final Map<String, Handler> handlers = new HashMap<>();
+    private final Path publicDir = Path.of(".", "public");
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(64);
     private ServerSocket serverSocket;
 
-    // список доступных путей к статическим файлам
+
     private final List<String> validPaths = List.of(
             "/index.html", "/spring.svg", "/spring.png",
             "/resources.html", "/styles.css", "/app.js",
@@ -39,19 +39,18 @@ public class Server {
     // запуск сервера
     public void start(int port) {
         try {
-            serverSocket = new ServerSocket(port); // создает ServerSocket на указанном порту
+            serverSocket = new ServerSocket(port);
             System.out.println("Сервер запущен на порту " + port);
             // бесконечный цикл ожидания подключений
             while (!threadPool.isShutdown()) {
                 final Socket socket = serverSocket.accept();
-                threadPool.execute(() -> serveClient(socket)); // ThreadPool
+                threadPool.execute(() -> serveClient(socket));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // обработка подключения
     private void serveClient(Socket socket) {
         try (socket;
              final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -63,18 +62,16 @@ public class Server {
             final var parts = requestLine.split(" ");
             if (parts.length != 3) return;
 
-            // используем Request вместо String
             final var request = new Request(parts[0], parts[1]);
 
-            // ищем Handler
+
             String handlerKey = request.getMethod() + " " + request.getPath();
             Handler handler = handlers.get(handlerKey);
             if (handler != null) {
-                handler.handle(request, out); // вызываем handler
+                handler.handle(request, out);
                 return;
             }
 
-            // при отсутствии handler → статический файл
             serveStatic(request.getPath(), out, request);
 
         } catch (IOException e) {
@@ -82,7 +79,6 @@ public class Server {
         }
     }
 
-    // статические файлы
     private void serveStatic(String path, OutputStream out, Request request) throws IOException {
         if (!validPaths.contains(path)) {
             send404((BufferedOutputStream) out);
@@ -103,13 +99,11 @@ public class Server {
         }
     }
 
-    // установка текущего времени
-    // добавлен Request
     private void sendClassicHtml(
             BufferedOutputStream out, Path filePath, String mimeType, Request request) throws IOException {
         final var template = Files.readString(filePath);
 
-        // Query параметры в HTML
+
         String timeParam = request.getQueryParameter("time");
         String nameParam = request.getQueryParameter("name");
 
@@ -129,7 +123,6 @@ public class Server {
         out.flush();
     }
 
-    // файл не найден
     private void send404(BufferedOutputStream out) throws IOException {
         out.write(("HTTP/1.1 404 Not Found\r\n" +
                 "Content-Length: 0\r\n" +
@@ -138,7 +131,6 @@ public class Server {
         out.flush();
     }
 
-    // отправка статических файлов HTML/CSS/JS/изображение
     private void sendFile(BufferedOutputStream out, Path filePath, String mimeType) throws IOException {
         final var length = Files.size(filePath);
         out.write(("HTTP/1.1 200 OK\r\n" +
@@ -149,7 +141,6 @@ public class Server {
         out.flush();
     }
 
-    // остановка ThreadPool и ServerSocket
     public void stop() {
         threadPool.shutdown();
         try {
