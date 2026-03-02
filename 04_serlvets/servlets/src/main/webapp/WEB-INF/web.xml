@@ -11,10 +11,10 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <!-- mapping - привязка к определённому URL-->
+    <!-- mapping - привязка к определённому URL. "/" ловит все запросы, роутинг в MainServlet -->
     <servlet-mapping>
         <servlet-name>main</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/api/posts</url-pattern>
     </servlet-mapping>
 </web-app>
 

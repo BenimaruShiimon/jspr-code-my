@@ -25,6 +25,15 @@ public class PostController {
 
   public void getById(long id, HttpServletResponse response) {
     // TODO: deserialize request & serialize response
+    service.getById(id);
+    response.setContentType(APPLICATION_JSON);
+    final var data = service.all();
+    final var gson = new Gson();
+      try {
+          response.getWriter().print(gson.toJson("Id: " + data + id));
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
   }
 
   public void save(Reader body, HttpServletResponse response) throws IOException {
@@ -37,5 +46,14 @@ public class PostController {
 
   public void removeById(long id, HttpServletResponse response) {
     // TODO: deserialize request & serialize response
+    service.removeById(id);
+    response.setContentType(APPLICATION_JSON);
+      try {
+          final var gson = new Gson();
+          response.getWriter().print(gson.toJson("Post deleted!" + response.getStatus()));
+          response.getWriter().flush();
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
   }
 }
