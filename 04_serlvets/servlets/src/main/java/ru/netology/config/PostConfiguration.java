@@ -14,12 +14,14 @@ public class PostConfiguration {
     }
 
     @Bean
-    public PostService postService(PostRepository postRepository) {
-        return new PostService(postRepository);
+    public PostService postService() {
+        PostService service = new PostService(postRepository());
+        return service;
     }
 
     @Bean
-    public PostController postController(PostService postService) {
-        return new PostController(postService);
+    public PostController postController() {
+       PostController controller = new PostController(postService());
+       return controller;
     }
 }
